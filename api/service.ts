@@ -4,9 +4,9 @@ const exec = util.promisify(cProcess.exec);
 import Ffmpeg, * as ffmpeg from "fluent-ffmpeg";
 import express from "express";
 import * as fs from "fs";
-const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
-console.log(ffmpegPath)
-ffmpeg.setFfmpegPath(ffmpegPath);
+//const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+//console.log(ffmpegPath)
+//ffmpeg.setFfmpegPath(ffmpegPath);
 
 export async function downloadVideo(
   video: string,

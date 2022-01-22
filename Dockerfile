@@ -12,8 +12,8 @@ RUN npm i -g ts-node
 COPY api/*.ts ./api/
 COPY api/yt-dlp ./api/
 RUN ["chmod", "+x", "./api/yt-dlp"]
-
-
+RUN apt-get update
+RUN apt-get install ffmpeg -y
 EXPOSE 3080
 
 CMD ["ts-node", "./api/index.ts"]
