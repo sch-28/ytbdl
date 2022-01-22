@@ -18,7 +18,7 @@
         </div>
         <div class="mt-5 flex-row d-flex" style="width: 50%">
           <v-text-field
-            :disabled="duration == 0"
+            :disabled="duration == 0 || duration == -1"
             label="Start"
             hide-details="auto"
             v-model="startTime"
@@ -26,7 +26,7 @@
             class="mr-5"
           ></v-text-field>
           <v-text-field
-            :disabled="duration == 0"
+            :disabled="duration == 0 || duration == -1"
             class="ml-5"
             label="End"
             :rules="[endRulesTest()]"
@@ -64,17 +64,16 @@ export default {
     endTime: "00:00:00",
     startTime: "00:00:00",
 
-    thumbnail: null,
     title: null,
 
     rules: [
       (value) => !!value || "Required.",
-      (value) =>
+      /* (value) =>
         (value &&
           !!value.match(
             /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/
           )) ||
-        "Not a valid url",
+        "Not a valid url", */
     ],
   }),
 
@@ -128,24 +127,38 @@ export default {
       );
     },
     downloadVideo() {
-      window.location.replace(
-        `/api/download?video=${encodeURIComponent(
+      let url = "/";
+      if (this.duration != -1 && this.video.length == 2) {
+        url = `/api/download?video=${encodeURIComponent(
           this.video[0]
         )}&audio=${encodeURIComponent(
           this.video[1]
         )}&start=${this.stringToSeconds(this.startTime)}&duration=${
           this.stringToSeconds(this.endTime) -
           this.stringToSeconds(this.startTime)
-        }&title=${this.title}`
-      );
+        }&title=${this.title}`;
+      } else if (this.duration != -1 && this.video.length == 1) {
+        url = `/api/download?video=${encodeURIComponent(
+          this.video[0]
+        )}&start=${this.stringToSeconds(this.startTime)}&duration=${
+          this.stringToSeconds(this.endTime) -
+          this.stringToSeconds(this.startTime)
+        }&title=${this.title}`;
+      } else if (this.duration == -1 && this.video.length == 1) {
+        url = `/api/download?video=${encodeURIComponent(
+          this.video[0]
+        )}&title=${this.title}`;
+      }
+
+      window.location.replace(url);
     },
     requestInfo() {
-      if (
+      /* if (
         !this.url.match(
           /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/
         )
       )
-        return;
+        return; */
 
       this.fetchingInfo = true;
       this.duration = 0;
@@ -153,7 +166,6 @@ export default {
       this.endTime = "00:00:00";
       this.startTime = "00:00:00";
       this.image = null;
-      this.thumbnail = null;
 
       fetch(`/api/info`, {
         method: "POST",
@@ -162,11 +174,15 @@ export default {
       }).then((response) =>
         response.json().then((result) => {
           this.fetchingInfo = false;
-          this.endTime = result.duration;
-          this.duration = this.stringToDate(this.endTime);
+          if (!result) return;
+          if (result.duration == "") {
+            this.duration = -1;
+          } else {
+            this.endTime = result.duration;
+            this.duration = this.stringToDate(this.endTime);
+          }
           this.video = result.video;
           this.title = result.title;
-          this.thumbnail = result.thumbnail;
         })
       );
     },

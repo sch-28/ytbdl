@@ -3,14 +3,16 @@ WORKDIR /usr/src/app
 COPY ytbdl-frontend/ ./ytbdl-frontend/
 RUN cd ytbdl-frontend && npm install && npm run build
 
-FROM nikolaik/python-nodejs:latest AS server-build
+FROM beevelop/nodejs-python AS server-build
 WORKDIR /root/
 COPY --from=ui-build /usr/src/app/ytbdl-frontend/dist ./ytbdl-frontend/dist
 COPY api/package*.json ./api/
-RUN cd api && npm install
+RUN cd api && npm install   
 RUN npm i -g ts-node
 COPY api/*.ts ./api/
 COPY api/yt-dlp ./api/
+RUN ["chmod", "+x", "./api/yt-dlp"]
+
 
 EXPOSE 3080
 
