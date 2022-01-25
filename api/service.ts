@@ -8,6 +8,59 @@ import * as fs from "fs";
 //console.log(ffmpegPath)
 //ffmpeg.setFfmpegPath(ffmpegPath);
 
+export async function downloadAudio(
+  video: string,
+  audio: string,
+  start: string,
+  duration: string,
+  title: string,
+  res: express.Response
+) {
+  res.setHeader("Content-type", "audio/mp3");
+  if(start != "" && duration != "")
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=${title}-Clip:${start}:${+start + +duration}.mp3`
+  );
+  else
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=${title}-Clip.mp3`
+  );
+  console.log(new Date().toLocaleString())
+  console.log(audio)
+  console.log(start)
+  console.log(duration)
+  if(video != "" && audio != "" && start != "" && duration != "") //youtube
+  ffmpeg
+    .default()
+    .addInput(audio)
+    .setStartTime(start)
+    .setDuration(duration)
+    .on("error", logError)
+    .outputOptions(['-f mp3'])
+    .output(res, { end: true })
+    .run();
+    else if(video != "" && audio == "" && start != "" && duration != "") //twitter
+    ffmpeg
+    .default()
+    .addInput(video)
+    .setStartTime(start)
+    .duration(duration)
+    .on("error", logError)
+    .outputOptions(['-f mp3'])
+    .output(res, { end: true })
+    .run();
+    else if(video != "" && audio == "" && start == "" && duration == "") //insta
+    ffmpeg
+    .default()
+    .addInput(video)
+    .on("error", logError)
+    .outputOptions(['-f mp3'])
+    .output(res, { end: true })
+    .run();
+}
+
 export async function downloadVideo(
   video: string,
   audio: string,
@@ -16,16 +69,16 @@ export async function downloadVideo(
   title: string,
   res: express.Response
 ) {
-  res.setHeader("Content-type", "video/mp4");
+  res.setHeader("Content-type", "video/mp3");
   if(start != "" && duration != "")
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=${title}-Clip:${start}:${+start + +duration}.mp4`
+    `attachment; filename=${title}-Clip:${start}:${+start + +duration}.mp3`
   );
   else
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=${title}-Clip.mp4`
+    `attachment; filename=${title}-Clip.mp3`
   );
   console.log(new Date().toLocaleString())
   console.log(video)
@@ -88,9 +141,10 @@ function fixDuration(duration: string): string {
 export async function getInfo(url: string) {
   //const reply = (await exec(`.\\yt-dlp.exe -g --get-duration --get-thumbnail -e ${url}`)).stdout
   try {
-    const reply = (await exec(`./api/yt-dlp -g --get-duration -e ${url}`))
+    const reply = (await exec(`./yt-dlp -g --get-duration -e ${url}`))
       .stdout;
     const results: string[] = reply.toString().split("\n");
+    console.log(results)
     if (results && results.length > 1) {
       const rLength = results.length - 1;
       let title: string = "";
@@ -118,6 +172,8 @@ export async function getInfo(url: string) {
         title: title.replace(/[^a-zA-Z 0-9]/g, "")
       };
     }
-  } catch {}
+  } catch(e){
+    console.log(e)
+  }
   return null;
 }

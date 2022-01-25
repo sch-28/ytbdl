@@ -42,9 +42,13 @@
           @click="downloadVideo"
           >Download</v-btn
         >
-        <!--  <video id="videoPlayer" controls>
-          <source :src="finishedVideo" type="video/mp4" />
-        </video> -->
+        <v-checkbox
+          v-model="audioOnly"
+          :label="`Audio only`"
+          hide-details
+          dense
+          class="mt-1"
+        ></v-checkbox>
       </v-container>
     </v-main>
   </v-app>
@@ -63,6 +67,8 @@ export default {
     video: null,
     endTime: "00:00:00",
     startTime: "00:00:00",
+
+    audioOnly: false,
 
     title: null,
 
@@ -145,11 +151,11 @@ export default {
           this.stringToSeconds(this.startTime)
         }&title=${this.title}`;
       } else if (this.duration == -1 && this.video.length == 1) {
-        url = `/api/download?video=${encodeURIComponent(
-          this.video[0]
-        )}&title=${this.title}`;
+        url = `/api/download?video=${encodeURIComponent(this.video[0])}&title=${
+          this.title
+        }`;
       }
-
+      if(url != "/")url+=`&audioOnly=${this.audioOnly}`;
       window.location.replace(url);
     },
     requestInfo() {
@@ -177,6 +183,7 @@ export default {
           if (!result) return;
           if (result.duration == "") {
             this.duration = -1;
+            console.log("test");
           } else {
             this.endTime = result.duration;
             this.duration = this.stringToDate(this.endTime);

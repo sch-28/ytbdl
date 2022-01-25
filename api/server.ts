@@ -40,21 +40,22 @@ class App {
       let start = "";
       let duration = "";
       let title = "";
+      let audioOnly = false;
       video = decodeURIComponent(req.query.video.toString());
       if (req.query.audio)
         audio = decodeURIComponent(req.query.audio.toString());
       if (req.query.start) start = req.query.start.toString();
       if (req.query.duration) duration = req.query.duration.toString();
+      if (req.query.audioOnly)
+        audioOnly = req.query.audioOnly.toString() == "true";
+
       title = req.query.title.toString().replace(/[^a-zA-Z 0-9]/g, "");
-      service.downloadVideo(video, audio, start, duration, title, res);
+      if (audioOnly) {
+        service.downloadAudio(video, audio, start,duration,title,res);
+      } else {
+        service.downloadVideo(video, audio, start, duration, title, res);
+      }
     });
-
-    // user route
-
-    // handle undefined routes
-    /*         this.express.use("*", (req, res, next) => {
-            res.send("Make sure url is correct!!!");
-        }); */
   }
 }
 
