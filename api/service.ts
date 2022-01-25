@@ -141,7 +141,7 @@ function fixDuration(duration: string): string {
 export async function getInfo(url: string) {
   //const reply = (await exec(`.\\yt-dlp.exe -g --get-duration --get-thumbnail -e ${url}`)).stdout
   try {
-    const reply = (await exec(`./yt-dlp -g --get-duration -e ${url}`))
+    const reply = (await exec(`./api/yt-dlp -g --get-duration -e ${url}`))
       .stdout;
     const results: string[] = reply.toString().split("\n");
     console.log(results)
