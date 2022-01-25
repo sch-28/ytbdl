@@ -69,16 +69,16 @@ export async function downloadVideo(
   title: string,
   res: express.Response
 ) {
-  res.setHeader("Content-type", "video/mp3");
+  res.setHeader("Content-type", "video/mp4");
   if(start != "" && duration != "")
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=${title}-Clip:${start}:${+start + +duration}.mp3`
+    `attachment; filename=${title}-Clip:${start}:${+start + +duration}.mp4`
   );
   else
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=${title}-Clip.mp3`
+    `attachment; filename=${title}-Clip.mp4`
   );
   console.log(new Date().toLocaleString())
   console.log(video)
