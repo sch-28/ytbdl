@@ -92,7 +92,7 @@ export async function downloadVideo(
     .setStartTime(start)
     .duration(duration)
     .on("error", logError)
-    .addOption('-preset veryfast')
+    .addOption('-preset ultrafast')
     .outputOptions(['-f mp4','-movflags frag_keyframe+empty_moov', '-crf 35'])
     .output(res, { end: true })
     .run();
@@ -103,8 +103,8 @@ export async function downloadVideo(
     .setStartTime(start)
     .duration(duration)
     .on("error", logError)
-    .addOption('-preset veryfast')
-    .outputOptions(['-f mp4','-movflags frag_keyframe+empty_moov', '-crf 30'])
+    .addOption('-preset ultrafast')
+    .outputOptions(['-f mp4','-movflags frag_keyframe+empty_moov', '-crf 35'])
     .output(res, { end: true })
     .run();
     else if(video != "" && audio == "" && start == "" && duration == "") //insta
@@ -112,8 +112,8 @@ export async function downloadVideo(
     .default()
     .addInput(video)
     .on("error", logError)
-    .addOption('-preset veryfast')
-    .outputOptions(['-f mp4','-movflags frag_keyframe+empty_moov', '-crf 30'])
+    .addOption('-preset ultrafast')
+    .outputOptions(['-f mp4','-movflags frag_keyframe+empty_moov', '-crf 35'])
     .output(res, { end: true })
     .run();
 }
@@ -141,7 +141,7 @@ function fixDuration(duration: string): string {
 export async function getInfo(url: string) {
   //const reply = (await exec(`.\\yt-dlp.exe -g --get-duration --get-thumbnail -e ${url}`)).stdout
   try {
-    const reply = (await exec(`./api/yt-dlp -g --get-duration -e ${url}`))
+    const reply = (await exec(`./yt-dlp -g --get-duration -e -S "height:720" ${url}`))
       .stdout;
     const results: string[] = reply.toString().split("\n");
     console.log(results)
